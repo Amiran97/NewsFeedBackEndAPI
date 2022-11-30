@@ -14,12 +14,12 @@ services:
     image: ${DOCKER_REGISTRY-}backend
     container_name: 'backend'
     build:
-      context: ./BackEnd.API
+      context: .
       dockerfile: Dockerfile
     ports:
       - "5000:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - DB_CONNECTION_STRING=Server=mssqldb;Database=StepWebShopIdentityDB;User=sa;Password=1Secure*Password1
+      - DB_CONNECTION_STRING=Server=mssqldb;Database=NewsFeedDb;User=sa;Password=1Secure*Password1
     depends_on:
       - mssqldb
