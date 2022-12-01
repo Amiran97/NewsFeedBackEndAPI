@@ -16,7 +16,7 @@ namespace BackEnd.API.Controllers
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces("application/json")]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
         private readonly NewsFeedContext context;
         private readonly UserManager<User> userManager;
@@ -44,7 +44,7 @@ namespace BackEnd.API.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login(LoginCredentialsRequestDTO credentials)
+        public async Task<IActionResult> Login(LoginCredentialsRequest credentials)
         {
             var user = await userManager.FindByEmailAsync(credentials.Email);
             if (user == null)
@@ -52,20 +52,20 @@ namespace BackEnd.API.Controllers
             if (!await userManager.CheckPasswordAsync(user, credentials.Password))
                 return BadRequest("Invalid email or password");
 
-            var accessToken = TokenGenerator.GenerateAccessToken(user);
-            var refreshToken = TokenGenerator.GenerateRefreshToken();
+            var accessToken = TokenHelper.GenerateAccessToken(user);
+            var refreshToken = TokenHelper.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.Now.AddDays(AuthOptions.REFRESH_VALID_DAYS);
 
             await userManager.UpdateAsync(user);
-            var response = new TokensDTO { AccessToken = accessToken, RefreshToken = refreshToken };
+            var response = new Tokens { AccessToken = accessToken, RefreshToken = refreshToken };
             return Ok(response);
         }
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register(RegisterCredentialsRequestDTO credentials)
+        public async Task<IActionResult> Register(RegisterCredentialsRequest credentials)
         {
             var user = new User
             {
@@ -79,20 +79,20 @@ namespace BackEnd.API.Controllers
 
             user = await userManager.FindByEmailAsync(credentials.Email);
 
-            var accessToken = TokenGenerator.GenerateAccessToken(user);
-            var refreshToken = TokenGenerator.GenerateRefreshToken();
+            var accessToken = TokenHelper.GenerateAccessToken(user);
+            var refreshToken = TokenHelper.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.Now.AddDays(AuthOptions.REFRESH_VALID_DAYS);
 
             await userManager.UpdateAsync(user);
-            var response = new TokensDTO { AccessToken = accessToken, RefreshToken = refreshToken };
+            var response = new Tokens { AccessToken = accessToken, RefreshToken = refreshToken };
             return Ok(response);
         }
 
         [HttpPost]
         [Route("refresh")]
-        public async Task<IActionResult> RefreshToken(TokensDTO tokenModel)
+        public async Task<IActionResult> RefreshToken(Tokens tokenModel)
         {
             if (tokenModel is null)
             {
@@ -102,7 +102,7 @@ namespace BackEnd.API.Controllers
             string? accessToken = tokenModel.AccessToken;
             string? refreshToken = tokenModel.RefreshToken;
 
-            var principal = GetPrincipalFromExpiredToken(accessToken);
+            var principal = TokenHelper.GetPrincipalFromExpiredToken(accessToken);
             if (principal == null)
             {
                 return BadRequest("Invalid access token or refresh token");
@@ -117,13 +117,13 @@ namespace BackEnd.API.Controllers
                 return BadRequest("Invalid access token or refresh token");
             }
 
-            var newAccessToken = TokenGenerator.GenerateAccessToken(user);
-            var newRefreshToken = TokenGenerator.GenerateRefreshToken();
+            var newAccessToken = TokenHelper.GenerateAccessToken(user);
+            var newRefreshToken = TokenHelper.GenerateRefreshToken();
 
             user.RefreshToken = newRefreshToken;
             await userManager.UpdateAsync(user);
 
-            var response = new TokensDTO { AccessToken = newAccessToken, RefreshToken = newRefreshToken };
+            var response = new Tokens { AccessToken = newAccessToken, RefreshToken = newRefreshToken };
             return Ok(response);
         }
 
@@ -154,28 +154,6 @@ namespace BackEnd.API.Controllers
             }
 
             return NoContent();
-        }
-
-        private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
-        {
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = true,
-                ValidAudience = AuthOptions.AUDIENCE,
-                ValidateIssuer = true,
-                ValidIssuer = AuthOptions.ISSUER,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromMinutes(AuthOptions.LIFETIME)
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
-
-            return principal;
         }
     }
 }

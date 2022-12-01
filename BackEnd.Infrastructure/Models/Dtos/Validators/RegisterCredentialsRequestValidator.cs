@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace BackEnd.Infrastructure.Models.Dtos.Validators
 {
-    public class RegisterCredentialsRequestDTOValidator : AbstractValidator<RegisterCredentialsRequestDTO>
+    public class RegisterCredentialsRequestValidator : AbstractValidator<RegisterCredentialsRequest>
     {
-        public RegisterCredentialsRequestDTOValidator() {
+        public RegisterCredentialsRequestValidator() {
             RuleFor(x => x.UserName).NotEmpty();
             RuleFor(x => x.Email).NotEmpty().EmailAddress();
             RuleFor(x => x.Password).NotEmpty();
