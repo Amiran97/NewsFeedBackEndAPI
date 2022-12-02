@@ -3,27 +3,27 @@ using BackEnd.Infrastructure.Context;
 using BackEnd.Infrastructure.Models.Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace BackEnd.API.Domains.Post.QueryHandlers
 {
-    public class GetPostsQueryHandle : IRequestHandler<GetPostsQuery, PostsResponse>
+    public class GetPostsByUserNameQueryHandler : IRequestHandler<GetPostsByUserNameQuery, PostsResponse>
     {
         private readonly NewsFeedContext context;
 
-        public GetPostsQueryHandle(NewsFeedContext context) {
+        public GetPostsByUserNameQueryHandler(NewsFeedContext context)
+        {
             this.context = context;
         }
 
-        public async Task<PostsResponse> Handle(GetPostsQuery request, CancellationToken cancellationToken)
+        public async Task<PostsResponse> Handle(GetPostsByUserNameQuery request, CancellationToken cancellationToken)
         {
-            var totalCount = await context.Posts.CountAsync();
-            var totalPages = totalCount / 10 + ((totalCount % 10) != 0 ? 1 : 0);
-            if(request.Page <= 0)
+            if (request.Page <= 0)
             {
                 return null;
             }
-            var postsResult = await context.Posts.Skip((request.Page-1) * 10).Take(10).Include(p=>p.Author).ToListAsync();
+            var postsResult = await context.Posts.Include(p => p.Author).Where(p => p.Author.UserName == request.UserName).Skip((request.Page - 1) * 10).Take(10).ToListAsync();
+            var totalCount = postsResult.Count;
+            var totalPages = totalCount / 10 + ((totalCount % 10) != 0 ? 1 : 0);
             var posts = new List<PostResponse>();
             postsResult.ForEach(item =>
             {
@@ -37,11 +37,13 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                     UpdatedAt = item.UpdatedAt
                 });
             });
-            var result = new PostsResponse() { 
-                Posts = posts, 
-                Page = request.Page, 
-                TotalCount = totalCount, 
-                TotalPages = totalPages};
+            var result = new PostsResponse()
+            {
+                Posts = posts,
+                Page = request.Page,
+                TotalCount = totalCount,
+                TotalPages = totalPages
+            };
             return result;
         }
     }

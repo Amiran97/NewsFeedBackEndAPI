@@ -27,8 +27,10 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
             var result = new PostResponse()
             {
                 Id = post.Id,
+                Title = post.Title,
                 Content = post.Content,
                 CreatedAt = post.CreatedAt,
+                UpdatedAt = post.UpdatedAt,
                 AuthorName = post.Author.UserName
             };
             return result;

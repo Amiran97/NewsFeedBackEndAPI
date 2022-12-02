@@ -21,10 +21,12 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
         {
             User author = await userManager.FindByNameAsync(request.AuthorName);
             var newPost = new Infrastructure.Models.Post() {
+                Title = request.Title,
                 Content = request.Context,
                 Author = author,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
+            newPost.UpdatedAt = newPost.CreatedAt;
             context.Posts.Add(newPost);
             await context.SaveChangesAsync();
             return Unit.Value;
