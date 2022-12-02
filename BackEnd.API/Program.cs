@@ -3,11 +3,13 @@ using BackEnd.Infrastructure.Context;
 using BackEnd.Infrastructure.Models;
 using BackEnd.Infrastructure.Models.Dtos.Validators;
 using FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +25,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddControllers();
-builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<RegisterCredentialsRequestDTOValidator>());
+builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<RegisterCredentialsRequestValidator>());
 builder.Services.AddEndpointsApiExplorer();
 var securityScheme = new OpenApiSecurityScheme()
 {
@@ -79,6 +81,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 builder.Services.AddDbContext<NewsFeedContext>(option => 
 {
     option.UseSqlServer(connectionString);
+    option.UseLazyLoadingProxies();
 });
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
@@ -100,6 +103,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.FromMinutes(AuthOptions.LIFETIME)
         };
     });
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 var app = builder.Build();
 
 var scope = app.Services.CreateScope();
@@ -108,6 +112,7 @@ if (db.Database.GetMigrations().Any())
 {
     db.Database.Migrate();
 }
+app.UseStaticFiles();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

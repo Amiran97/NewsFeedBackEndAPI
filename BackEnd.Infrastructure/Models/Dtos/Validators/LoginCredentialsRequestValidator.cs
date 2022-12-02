@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace BackEnd.Infrastructure.Models.Dtos.Validators
 {
-    public class LoginCredentialsRequestDTOValidator : AbstractValidator<LoginCredentialsRequestDTO>
+    public class LoginCredentialsRequestValidator : AbstractValidator<LoginCredentialsRequest>
     {
-        public LoginCredentialsRequestDTOValidator() {
+        public LoginCredentialsRequestValidator() {
             RuleFor(x => x.Email).NotEmpty().EmailAddress();
-            RuleFor(x => x.Password).NotEmpty();
+            RuleFor(x => x.Password).NotEmpty().Matches(@"^[\S]+$").MinimumLength(8).MaximumLength(32);
         }
     }
 }
