@@ -24,14 +24,15 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                 return null;
             }
             var likes = await context.PostLikes.Include(pl => pl.Post).Include(pl => pl.Author).Where(pl=>pl.Post.Id == request.Id).ToListAsync();
-            var likesResult = new List<PostLikeResponse>();
+            var likesResult = new List<LikeResponse>();
             likes.ForEach(pl =>
             {
-                likesResult.Add(new PostLikeResponse
+                likesResult.Add(new LikeResponse
                 {
                     AuthorName = pl.Author.UserName
                 });
             });
+            var commentCount = await context.Comments.Include(c => c.Post).Where(c => c.Post.Id == request.Id).CountAsync();
             var result = new PostResponse()
             {
                 Id = post.Id,
@@ -40,7 +41,8 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                 CreatedAt = post.CreatedAt,
                 UpdatedAt = post.UpdatedAt,
                 AuthorName = post.Author.UserName,
-                Likes = likesResult
+                Likes = likesResult,
+                CommentCount = commentCount
             };
             return result;
         }

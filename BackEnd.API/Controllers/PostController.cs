@@ -22,7 +22,7 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpGet]
-        [Route("/{page}")]
+        [Route("{page}")]
         public async Task<IActionResult> getPosts(int page = 1)
         {
             var result = await mediator.Send(new GetPostsQuery() { Page = page });
@@ -34,7 +34,7 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpGet]
-        [Route("/{userName}/{page}")]
+        [Route("{userName}/{page}")]
         public async Task<IActionResult> getPostsByUserName([BindRequired][FromRoute] string userName, [FromRoute] int page = 1)
         {
             var result = await mediator.Send(new GetPostsByUserNameQuery() { UserName = userName, Page = page });
@@ -46,7 +46,7 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpGet]
-        [Route("/post/{id}")]
+        [Route("detail/{id}")]
         public async Task<IActionResult> getPostById([BindRequired] int id)
         {
             var result = await mediator.Send(new GetPostByIdQuery() { Id = id });
@@ -79,7 +79,7 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpPut]
-        [Route("/{id}")]
+        [Route("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> updatePost([BindRequired][FromRoute] int id, [FromBody] PostRequest request)
         {
@@ -101,7 +101,7 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpDelete]
-        [Route("/{id}")]
+        [Route("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> deletePost([BindRequired] int id)
         {
