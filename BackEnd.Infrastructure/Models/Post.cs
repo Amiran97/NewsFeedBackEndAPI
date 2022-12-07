@@ -11,20 +11,14 @@ namespace BackEnd.Infrastructure.Models
 {
     public class Post
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
-        [MaxLength(100)]
         public string Title { get; set; }
-        [Required]
-        [MaxLength(255)]
         public string Content { get; set; }
-        [Required]
         public DateTime CreatedAt { get; set; }
-        [Required]
         public DateTime UpdatedAt { get; set; }
-        [Required]
+        public string AuthorId { get; set; }
         public virtual User Author { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<User> Likes { get; set; }
     }
 }

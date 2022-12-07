@@ -175,8 +175,7 @@ namespace BackEnd.Infrastructure.Migrations
                         name: "FK_Posts_AspNetUsers_AuthorId",
                         column: x => x.AuthorId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -187,7 +186,7 @@ namespace BackEnd.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Message = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PostId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -202,55 +201,52 @@ namespace BackEnd.Infrastructure.Migrations
                         name: "FK_Comments_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "PostLikes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PostId = table.Column<int>(type: "int", nullable: false),
-                    AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    LikesId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PostLikesId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PostLikes", x => x.Id);
+                    table.PrimaryKey("PK_PostLikes", x => new { x.LikesId, x.PostLikesId });
                     table.ForeignKey(
-                        name: "FK_PostLikes_AspNetUsers_AuthorId",
-                        column: x => x.AuthorId,
+                        name: "FK_PostLikes_AspNetUsers_LikesId",
+                        column: x => x.LikesId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PostLikes_Posts_PostId",
-                        column: x => x.PostId,
+                        name: "FK_PostLikes_Posts_PostLikesId",
+                        column: x => x.PostLikesId,
                         principalTable: "Posts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CommentsLikes",
+                name: "CommentLikes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CommentId = table.Column<int>(type: "int", nullable: false),
-                    AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CommentLikesId = table.Column<int>(type: "int", nullable: false),
+                    LikesId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommentsLikes", x => x.Id);
+                    table.PrimaryKey("PK_CommentLikes", x => new { x.CommentLikesId, x.LikesId });
                     table.ForeignKey(
-                        name: "FK_CommentsLikes_AspNetUsers_AuthorId",
-                        column: x => x.AuthorId,
+                        name: "FK_CommentLikes_AspNetUsers_LikesId",
+                        column: x => x.LikesId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CommentsLikes_Comments_CommentId",
-                        column: x => x.CommentId,
+                        name: "FK_CommentLikes_Comments_CommentLikesId",
+                        column: x => x.CommentLikesId,
                         principalTable: "Comments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -296,6 +292,11 @@ namespace BackEnd.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CommentLikes_LikesId",
+                table: "CommentLikes",
+                column: "LikesId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Comments_AuthorId",
                 table: "Comments",
                 column: "AuthorId");
@@ -306,24 +307,9 @@ namespace BackEnd.Infrastructure.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommentsLikes_AuthorId",
-                table: "CommentsLikes",
-                column: "AuthorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CommentsLikes_CommentId",
-                table: "CommentsLikes",
-                column: "CommentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PostLikes_AuthorId",
+                name: "IX_PostLikes_PostLikesId",
                 table: "PostLikes",
-                column: "AuthorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PostLikes_PostId",
-                table: "PostLikes",
-                column: "PostId");
+                column: "PostLikesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_AuthorId",
@@ -349,7 +335,7 @@ namespace BackEnd.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CommentsLikes");
+                name: "CommentLikes");
 
             migrationBuilder.DropTable(
                 name: "PostLikes");

@@ -31,6 +31,7 @@ namespace BackEnd.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("AuthorId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreateAt")
@@ -50,30 +51,7 @@ namespace BackEnd.Infrastructure.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("BackEnd.Infrastructure.Models.CommentLike", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("AuthorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("CommentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("CommentId");
-
-                    b.ToTable("CommentsLikes");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd.Infrastructure.Models.Post", b =>
@@ -108,30 +86,7 @@ namespace BackEnd.Infrastructure.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("BackEnd.Infrastructure.Models.PostLike", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("AuthorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("PostId");
-
-                    b.ToTable("PostLikes");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd.Infrastructure.Models.User", b =>
@@ -203,6 +158,21 @@ namespace BackEnd.Infrastructure.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("CommentUser", b =>
+                {
+                    b.Property<int>("CommentLikesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LikesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CommentLikesId", "LikesId");
+
+                    b.HasIndex("LikesId");
+
+                    b.ToTable("CommentLikes", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -338,66 +308,64 @@ namespace BackEnd.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("PostUser", b =>
+                {
+                    b.Property<string>("LikesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("PostLikesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("LikesId", "PostLikesId");
+
+                    b.HasIndex("PostLikesId");
+
+                    b.ToTable("PostLikes", (string)null);
+                });
+
             modelBuilder.Entity("BackEnd.Infrastructure.Models.Comment", b =>
                 {
                     b.HasOne("BackEnd.Infrastructure.Models.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId");
+                        .WithMany("Comments")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("BackEnd.Infrastructure.Models.Post", "Post")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Author");
 
                     b.Navigation("Post");
-                });
-
-            modelBuilder.Entity("BackEnd.Infrastructure.Models.CommentLike", b =>
-                {
-                    b.HasOne("BackEnd.Infrastructure.Models.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId");
-
-                    b.HasOne("BackEnd.Infrastructure.Models.Comment", "Comment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Comment");
                 });
 
             modelBuilder.Entity("BackEnd.Infrastructure.Models.Post", b =>
                 {
                     b.HasOne("BackEnd.Infrastructure.Models.User", "Author")
-                        .WithMany()
+                        .WithMany("Posts")
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("BackEnd.Infrastructure.Models.PostLike", b =>
+            modelBuilder.Entity("CommentUser", b =>
                 {
-                    b.HasOne("BackEnd.Infrastructure.Models.User", "Author")
+                    b.HasOne("BackEnd.Infrastructure.Models.Comment", null)
                         .WithMany()
-                        .HasForeignKey("AuthorId");
-
-                    b.HasOne("BackEnd.Infrastructure.Models.Post", "Post")
-                        .WithMany()
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("CommentLikesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Author");
-
-                    b.Navigation("Post");
+                    b.HasOne("BackEnd.Infrastructure.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("LikesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -449,6 +417,33 @@ namespace BackEnd.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("PostUser", b =>
+                {
+                    b.HasOne("BackEnd.Infrastructure.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("LikesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Infrastructure.Models.Post", null)
+                        .WithMany()
+                        .HasForeignKey("PostLikesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BackEnd.Infrastructure.Models.Post", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("BackEnd.Infrastructure.Models.User", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }
