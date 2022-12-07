@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace BackEnd.Infrastructure.Models.Dtos
 {
-    public class PostLikeResponse
+    public class CommentRequest
     {
-        public string AuthorName { get; set; }
+        public string Message { get; set; }
     }
 }

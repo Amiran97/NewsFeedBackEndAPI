@@ -10,6 +10,8 @@ namespace BackEnd.Infrastructure.Context
     {
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostLike> PostLikes { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<CommentLike> CommentsLikes { get; set; }
 
         public NewsFeedContext(DbContextOptions options) : base(options)
         {
