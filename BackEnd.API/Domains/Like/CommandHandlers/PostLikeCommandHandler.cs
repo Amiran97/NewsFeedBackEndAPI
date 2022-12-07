@@ -21,19 +21,21 @@ namespace BackEnd.API.Domains.Like.CommandHandlers
         public async Task<Unit> Handle(PostLikeCommand request, CancellationToken cancellationToken)
         {
             User author = await userManager.FindByNameAsync(request.AuthorName);
-            Infrastructure.Models.Post post = await context.Posts.FindAsync(request.Id);
+            Infrastructure.Models.Post post = await context.Posts.Where(p=>p.Id == request.Id).Include(p=>p.Author).FirstOrDefaultAsync();
 
-            if(author != null && post != null) {
-                PostLike postLike = await context.PostLikes.Include(pl => pl.Post).Include(pl=>pl.Author)
-                    .FirstOrDefaultAsync(pl => pl.Post.Id == request.Id && pl.Author.UserName == request.AuthorName);
-                if(postLike != null)
+            if (author != null && post != null)
+            {
+                User postLike = post.Likes.ToList().Find(u => u.UserName == request.AuthorName);
+                if (postLike != null)
                 {
-                    context.PostLikes.Remove(postLike);
+                    post.Likes.Remove(postLike);
+                    context.Posts.Update(post);
                     await context.SaveChangesAsync();
-                } else
+                }
+                else
                 {
-                    postLike = new PostLike { Author = author, Post = post };
-                    context.PostLikes.Add(postLike);
+                    post.Likes.Add(author);
+                    context.Posts.Update(post);
                     await context.SaveChangesAsync();
                 }
             }

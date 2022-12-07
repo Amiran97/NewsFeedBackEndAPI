@@ -18,21 +18,19 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
 
         public async Task<PostResponse> Handle(GetPostByIdQuery request, CancellationToken cancellationToken)
         {
-            var post = await context.Posts.Include(p=>p.Author).FirstOrDefaultAsync(p=>p.Id == request.Id);
+            var post = await context.Posts.Include(p=>p.Author).Where(p=>p.Id == request.Id).Include(p => p.Comments).Include(p=>p.Likes).FirstOrDefaultAsync();
             if(post == null)
             {
                 return null;
             }
-            var likes = await context.PostLikes.Include(pl => pl.Post).Include(pl => pl.Author).Where(pl=>pl.Post.Id == request.Id).ToListAsync();
             var likesResult = new List<LikeResponse>();
-            likes.ForEach(pl =>
+            post.Likes.ToList().ForEach(item =>
             {
                 likesResult.Add(new LikeResponse
                 {
-                    AuthorName = pl.Author.UserName
+                    AuthorName = item.UserName
                 });
             });
-            var commentCount = await context.Comments.Include(c => c.Post).Where(c => c.Post.Id == request.Id).CountAsync();
             var result = new PostResponse()
             {
                 Id = post.Id,
@@ -42,7 +40,7 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                 UpdatedAt = post.UpdatedAt,
                 AuthorName = post.Author.UserName,
                 Likes = likesResult,
-                CommentCount = commentCount
+                CommentCount = post.Comments.Count
             };
             return result;
         }

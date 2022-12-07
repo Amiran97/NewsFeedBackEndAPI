@@ -21,29 +21,20 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
             {
                 return null;
             }
-            var postsResult = await context.Posts.Include(p => p.Author).Where(p => p.Author.UserName == request.UserName).Skip((request.Page - 1) * 10).Take(10).ToListAsync();
+            var postsResult = await context.Posts.Include(p => p.Author).Where(p => p.Author.UserName == request.UserName).Skip((request.Page - 1) * 10).Take(10).Include(p=>p.Comments).Include(p=>p.Likes).ToListAsync();
             var totalCount = postsResult.Count;
             var totalPages = totalCount / 10 + ((totalCount % 10) != 0 ? 1 : 0);
-
-            var likes = await context.PostLikes.Include(pl => pl.Post).Include(pl => pl.Author).ToListAsync();
-
             var posts = new List<PostResponse>();
-            var comments = await context.Comments.Include(c => c.Post).ToListAsync();
-
             postsResult.ForEach(item =>
             {
                 var likesResult = new List<LikeResponse>();
-                likes.ForEach(pl =>
+                item.Likes.ToList().ForEach(pl =>
                 {
-                    if (pl.Post.Id == item.Id)
+                    likesResult.Add(new LikeResponse
                     {
-                        likesResult.Add(new LikeResponse
-                        {
-                            AuthorName = pl.Author.UserName
-                        });
-                    }
+                        AuthorName = pl.UserName
+                    });
                 });
-                var commentCount = comments.Where(c => c.Post.Id == item.Id).Count();
                 posts.Add(new PostResponse
                 {
                     Id = item.Id,
@@ -53,7 +44,7 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                     CreatedAt = item.CreatedAt,
                     UpdatedAt = item.UpdatedAt,
                     Likes = likesResult,
-                    CommentCount = commentCount
+                    CommentCount = item.Comments.Count,
                 });
             });
             var result = new PostsResponse()

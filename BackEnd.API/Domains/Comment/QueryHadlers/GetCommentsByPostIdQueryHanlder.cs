@@ -18,21 +18,17 @@ namespace BackEnd.API.Domains.Comment.QueryHadlers
         public async Task<IEnumerable<CommentResponse>> Handle(GetCommentsByPostIdQuery request, CancellationToken cancellationToken)
         {
             
-            var comments = await context.Comments.Include(c=>c.Post).Where(c=>c.Post.Id == request.PostId).ToListAsync();
+            var comments = await context.Comments.Include(c=>c.Post).Where(c=>c.Post.Id == request.PostId).Include(c=>c.Likes).Include(c=>c.Author).ToListAsync();
             var result = new List<CommentResponse>();
-            var likes = await context.CommentsLikes.Include(pl => pl.Comment).Include(pl => pl.Author).ToListAsync();
             comments.ForEach(item =>
             {
                 var likesResult = new List<LikeResponse>();
-                likes.ForEach(pl =>
+                item.Likes.ToList().ForEach(pl =>
                 {
-                    if (pl.Comment.Id == item.Id)
+                    likesResult.Add(new LikeResponse
                     {
-                        likesResult.Add(new LikeResponse
-                        {
-                            AuthorName = pl.Author.UserName
-                        });
-                    }
+                        AuthorName = pl.UserName
+                    });
                 });
                 result.Add(new CommentResponse
                 {

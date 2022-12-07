@@ -11,5 +11,9 @@ namespace BackEnd.Infrastructure.Models
     {
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
+        public virtual ICollection<Post> Posts { get; set; }
+        public virtual ICollection<Post> PostLikes { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Comment> CommentLikes { get; set; }
     }
 }
