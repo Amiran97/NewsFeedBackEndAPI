@@ -26,7 +26,7 @@ namespace BackEnd.API.Controllers
         public async Task<IActionResult> getPosts(int page = 1)
         {
             var result = await mediator.Send(new GetPostsQuery() { Page = page });
-            if(result == null)
+            if (result == null)
             {
                 return BadRequest("Incorrect number of page");
             }
@@ -35,7 +35,7 @@ namespace BackEnd.API.Controllers
 
         [HttpGet]
         [Route("/{userName}/{page}")]
-        public async Task<IActionResult>  getPostsByUserName([BindRequired][FromRoute] string userName, [FromRoute] int page = 1)
+        public async Task<IActionResult> getPostsByUserName([BindRequired][FromRoute] string userName, [FromRoute] int page = 1)
         {
             var result = await mediator.Send(new GetPostsByUserNameQuery() { UserName = userName, Page = page });
             if (result == null)
@@ -50,7 +50,7 @@ namespace BackEnd.API.Controllers
         public async Task<IActionResult> getPostById([BindRequired] int id)
         {
             var result = await mediator.Send(new GetPostByIdQuery() { Id = id });
-            if(result == null)
+            if (result == null)
             {
                 return NotFound(id);
             }
@@ -69,11 +69,12 @@ namespace BackEnd.API.Controllers
                     Context = request.Content,
                     AuthorName = User.Identity.Name
                 });
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest();
             }
-            
+
             return NoContent();
         }
 
@@ -111,7 +112,8 @@ namespace BackEnd.API.Controllers
                     Id = id,
                     AuthorName = User.Identity.Name
                 });
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest();
             }

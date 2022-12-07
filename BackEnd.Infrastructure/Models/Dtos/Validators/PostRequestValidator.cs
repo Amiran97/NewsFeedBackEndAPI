@@ -12,8 +12,8 @@ namespace BackEnd.Infrastructure.Models.Dtos.Validators
     {
         public PostRequestValidator()
         {
-            RuleFor(p=>p.Title).NotEmpty().Matches(@"^[\S]+$").MaximumLength(100);
-            RuleFor(p=>p.Content).NotEmpty().Matches(@"^[\S]+$").MaximumLength(255);
+            RuleFor(p=>p.Title).NotEmpty().MaximumLength(100);
+            RuleFor(p=>p.Content).NotEmpty().MaximumLength(255);
         }
     }
 }
