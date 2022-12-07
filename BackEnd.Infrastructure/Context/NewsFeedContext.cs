@@ -9,6 +9,7 @@ namespace BackEnd.Infrastructure.Context
     public class NewsFeedContext : IdentityDbContext<User>
     {
         public DbSet<Post> Posts { get; set; }
+        public DbSet<PostLike> PostLikes { get; set; }
 
         public NewsFeedContext(DbContextOptions options) : base(options)
         {

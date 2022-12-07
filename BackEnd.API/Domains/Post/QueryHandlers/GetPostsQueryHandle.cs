@@ -24,9 +24,21 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                 return null;
             }
             var postsResult = await context.Posts.Skip((request.Page-1) * 10).Take(10).Include(p=>p.Author).ToListAsync();
+            var likes = await context.PostLikes.Include(pl => pl.Post).Include(pl => pl.Author).ToListAsync();
             var posts = new List<PostResponse>();
             postsResult.ForEach(item =>
             {
+                var likesResult = new List<PostLikeResponse>();
+                likes.ForEach(pl =>
+                {
+                    if (pl.Post.Id == item.Id)
+                    {
+                        likesResult.Add(new PostLikeResponse
+                        {
+                            AuthorName = pl.Author.UserName
+                        });
+                    }
+                });
                 posts.Add(new PostResponse
                 {
                     Id = item.Id,
@@ -34,7 +46,8 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                     Content = item.Content,
                     AuthorName = item.Author.UserName,
                     CreatedAt = item.CreatedAt,
-                    UpdatedAt = item.UpdatedAt
+                    UpdatedAt = item.UpdatedAt,
+                    Likes = likesResult
                 });
             });
             var result = new PostsResponse() { 
