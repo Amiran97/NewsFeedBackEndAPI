@@ -22,13 +22,10 @@ namespace BackEnd.API.Domains.Comment.QueryHadlers
             var result = new List<CommentResponse>();
             comments.ForEach(item =>
             {
-                var likesResult = new List<LikeResponse>();
+                var likesResult = new List<string>();
                 item.Likes.ToList().ForEach(pl =>
                 {
-                    likesResult.Add(new LikeResponse
-                    {
-                        AuthorName = pl.UserName
-                    });
+                    likesResult.Add(pl.UserName);
                 });
                 result.Add(new CommentResponse
                 {

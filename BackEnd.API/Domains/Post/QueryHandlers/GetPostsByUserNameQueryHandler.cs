@@ -21,20 +21,22 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
             {
                 return null;
             }
-            var postsResult = await context.Posts.Include(p => p.Author).Where(p => p.Author.UserName == request.UserName).Skip((request.Page - 1) * 10).Take(10).Include(p=>p.Comments).Include(p=>p.Likes).ToListAsync();
+            var postsResult = await context.Posts.Include(p => p.Author).Where(p => p.Author.UserName == request.UserName).Skip((request.Page - 1) * 10).Take(10).Include(p=>p.Comments).Include(p=>p.Likes).Include(p=>p.Tags).ToListAsync();
             var totalCount = postsResult.Count;
             var totalPages = totalCount / 10 + ((totalCount % 10) != 0 ? 1 : 0);
             var posts = new List<PostResponse>();
             postsResult.ForEach(item =>
             {
-                var likesResult = new List<LikeResponse>();
+                var likesResult = new List<string>();
                 item.Likes.ToList().ForEach(pl =>
                 {
-                    likesResult.Add(new LikeResponse
-                    {
-                        AuthorName = pl.UserName
-                    });
+                    likesResult.Add(pl.UserName);
                 });
+                var tags = new List<string>();
+                foreach (var tag in item.Tags)
+                {
+                    tags.Add(tag.Name);
+                }
                 posts.Add(new PostResponse
                 {
                     Id = item.Id,
@@ -45,6 +47,7 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                     UpdatedAt = item.UpdatedAt,
                     Likes = likesResult,
                     CommentCount = item.Comments.Count,
+                    Tags = tags
                 });
             });
             var result = new PostsResponse()

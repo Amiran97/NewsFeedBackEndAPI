@@ -22,28 +22,27 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpGet]
-        [Route("{page}")]
-        public async Task<IActionResult> getPosts(int page = 1)
+        public async Task<IActionResult> getPosts([FromQuery] PostsRequest request)
         {
-            var result = await mediator.Send(new GetPostsQuery() { Page = page });
+            PostsResponse result = null;
+            if(request.UserName != null)
+            {
+                result = await mediator.Send(new GetPostsByUserNameQuery() { Page = request.Page, UserName = request.UserName });
+            } else if(request.Tag != null)
+            {
+                result = await mediator.Send(new GetPostsByTagQuery() { Page = request.Page, Tag = request.Tag });
+            } else
+            {
+                result = await mediator.Send(new GetPostsQuery() { Page = request.Page });
+            }
             if (result == null)
             {
-                return BadRequest("Incorrect number of page");
+                return BadRequest();
             }
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{userName}/{page}")]
-        public async Task<IActionResult> getPostsByUserName([BindRequired][FromRoute] string userName, [FromRoute] int page = 1)
-        {
-            var result = await mediator.Send(new GetPostsByUserNameQuery() { UserName = userName, Page = page });
-            if (result == null)
-            {
-                return BadRequest("Incorrect userName or number of page");
-            }
-            return Ok(result);
-        }
+        
 
         [HttpGet]
         [Route("detail/{id}")]
@@ -67,7 +66,8 @@ namespace BackEnd.API.Controllers
                 {
                     Title = request.Title,
                     Context = request.Content,
-                    AuthorName = User.Identity.Name
+                    AuthorName = User.Identity.Name,
+                    Tags = request.Tags
                 });
             }
             catch (Exception ex)
@@ -90,7 +90,8 @@ namespace BackEnd.API.Controllers
                     Id = id,
                     Title = request.Title,
                     Context = request.Content,
-                    AuthorName = User.Identity.Name
+                    AuthorName = User.Identity.Name,
+                    Tags = request.Tags
                 });
             }
             catch (Exception ex)
