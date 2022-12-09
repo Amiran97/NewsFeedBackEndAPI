@@ -1,7 +1,7 @@
 using BackEnd.API.Options;
-using BackEnd.Infrastructure.Context;
-using BackEnd.Infrastructure.Models;
-using BackEnd.Infrastructure.Models.Dtos.Validators;
+using BackEnd.API.Context;
+using BackEnd.API.Models;
+using BackEnd.API.Models.Dtos.Validators;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

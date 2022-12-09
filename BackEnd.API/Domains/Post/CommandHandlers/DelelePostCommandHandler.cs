@@ -1,6 +1,6 @@
 ﻿using BackEnd.API.Domains.Post.Commands;
-using BackEnd.Infrastructure.Context;
-using BackEnd.Infrastructure.Models;
+using BackEnd.API.Context;
+using BackEnd.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

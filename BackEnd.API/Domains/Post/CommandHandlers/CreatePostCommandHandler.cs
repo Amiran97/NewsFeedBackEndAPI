@@ -1,6 +1,6 @@
 ﻿using BackEnd.API.Domains.Post.Commands;
-using BackEnd.Infrastructure.Context;
-using BackEnd.Infrastructure.Models;
+using BackEnd.API.Context;
+using BackEnd.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -20,7 +20,7 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
         public async Task<Unit> Handle(CreatePostCommand request, CancellationToken cancellationToken)
         {
             User author = await userManager.FindByNameAsync(request.AuthorName);
-            var newPost = new Infrastructure.Models.Post() {
+            var newPost = new Models.Post() {
                 Title = request.Title,
                 Content = request.Context,
                 Author = author,

@@ -1,6 +1,6 @@
 ﻿using BackEnd.API.Domains.Comment.Queries;
-using BackEnd.Infrastructure.Context;
-using BackEnd.Infrastructure.Models.Dtos;
+using BackEnd.API.Context;
+using BackEnd.API.Models.Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

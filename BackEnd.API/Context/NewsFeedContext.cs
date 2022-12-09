@@ -1,4 +1,4 @@
-﻿using BackEnd.Infrastructure.Models;
+﻿using BackEnd.API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Reflection.Emit;
 
-namespace BackEnd.Infrastructure.Context
+namespace BackEnd.API.Context
 {
     public class NewsFeedContext : IdentityDbContext<User>
     {
