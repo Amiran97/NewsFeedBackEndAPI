@@ -25,8 +25,21 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
                 Content = request.Context,
                 Author = author,
                 CreatedAt = DateTime.UtcNow,
+                Tags = new List<Tag>()
             };
             newPost.UpdatedAt = newPost.CreatedAt;
+            if(request.Tags != null && request.Tags.Count > 0)
+            {
+                var realTags = context.Tags.Where(t => request.Tags.Contains(t.Name)).ToList();
+                realTags.ForEach(tag => newPost.Tags.Add(tag));
+                var tagsToCreate = request.Tags.Where(t => !realTags.Exists(r => r.Name == t));
+                foreach(var item in tagsToCreate)
+                {
+                    var tag = new Tag { Name = item };
+                    context.Tags.Add(tag);
+                    newPost.Tags.Add(tag);
+                }
+            }
             context.Posts.Add(newPost);
             await context.SaveChangesAsync();
             return Unit.Value;

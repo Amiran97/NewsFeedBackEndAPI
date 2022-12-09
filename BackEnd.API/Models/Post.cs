@@ -20,5 +20,6 @@ namespace BackEnd.API.Models
         public virtual User Author { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<User> Likes { get; set; }
+        public virtual ICollection<Tag> Tags { get; set; }
     }
 }

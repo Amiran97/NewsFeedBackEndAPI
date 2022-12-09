@@ -15,6 +15,6 @@ namespace BackEnd.API.Models.Dtos
         public string Message { get; set; }
         public DateTime CreateAt { get; set; }
         public string AuthorName { get; set; }
-        public ICollection<LikeResponse> Likes { get; set; }
+        public ICollection<string> Likes { get; set; }
     }
 }

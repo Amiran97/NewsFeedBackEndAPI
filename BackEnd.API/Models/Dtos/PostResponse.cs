@@ -15,7 +15,8 @@ namespace BackEnd.API.Models.Dtos
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public string AuthorName { get; set; }
-        public ICollection<LikeResponse> Likes { get; set; }
+        public ICollection<string> Likes { get; set; }
+        public ICollection<string> Tags { get; set; }
         public int CommentCount { get; set; }
         
     }

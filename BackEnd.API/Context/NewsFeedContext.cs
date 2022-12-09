@@ -12,6 +12,7 @@ namespace BackEnd.API.Context
     {
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         public NewsFeedContext(DbContextOptions options) : base(options)
         {
@@ -36,6 +37,8 @@ namespace BackEnd.API.Context
 
             builder.Entity<Post>().HasMany(p => p.Likes).WithMany(c => c.PostLikes).UsingEntity(t => t.ToTable("PostLikes"));
 
+            builder.Entity<Post>().HasMany(p => p.Tags).WithMany(c => c.Posts).UsingEntity(t => t.ToTable("PostTags"));
+
             // Comment
             builder.Entity<Comment>().ToTable("Comments");
 
@@ -49,6 +52,16 @@ namespace BackEnd.API.Context
             builder.Entity<Comment>().HasOne(c => c.Post).WithMany(p => p.Comments).HasForeignKey(c => c.PostId).OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Comment>().HasMany(c => c.Likes).WithMany(u => u.CommentLikes).UsingEntity(t => t.ToTable("CommentLikes"));
+
+            // Tag
+            builder.Entity<Tag>().ToTable("Tags");
+
+            builder.Entity<Tag>().HasKey(c => c.Id);
+            builder.Entity<Tag>().Property(c => c.Id).ValueGeneratedOnAdd();
+
+            builder.Entity<Tag>().Property(c => c.Name).HasMaxLength(32).IsRequired();
+
+            builder.Entity<Tag>().HasMany(p => p.Posts).WithMany(c => c.Tags).UsingEntity(t => t.ToTable("PostTags"));
 
             base.OnModelCreating(builder);
         }

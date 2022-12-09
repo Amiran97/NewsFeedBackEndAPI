@@ -1,29 +1,35 @@
-﻿using BackEnd.API.Domains.Post.Queries;
-using BackEnd.API.Context;
+﻿using BackEnd.API.Context;
+using BackEnd.API.Domains.Post.Queries;
 using BackEnd.API.Models.Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace BackEnd.API.Domains.Post.QueryHandlers
 {
-    public class GetPostsQueryHandle : IRequestHandler<GetPostsQuery, PostsResponse>
+    public class GetPostsByTagQueryHandler : IRequestHandler<GetPostsByTagQuery, PostsResponse>
     {
         private readonly NewsFeedContext context;
 
-        public GetPostsQueryHandle(NewsFeedContext context) {
+        public GetPostsByTagQueryHandler(NewsFeedContext context)
+        {
             this.context = context;
         }
 
-        public async Task<PostsResponse> Handle(GetPostsQuery request, CancellationToken cancellationToken)
+        public async Task<PostsResponse> Handle(GetPostsByTagQuery request, CancellationToken cancellationToken)
         {
-            var totalCount = await context.Posts.CountAsync();
-            var totalPages = totalCount / 10 + ((totalCount % 10) != 0 ? 1 : 0);
-            if(request.Page <= 0)
+            if (request.Page <= 0)
             {
                 return null;
             }
-            var postsResult = await context.Posts.Skip((request.Page-1) * 10).Take(10).Include(p=>p.Author).Include(p=>p.Comments).Include(p=>p.Likes).Include(p=>p.Tags).ToListAsync();
+            var tag = await context.Tags.Where(t => t.Name == request.Tag)
+                .Include(t => t.Posts).ThenInclude(p => p.Author)
+                .Include(t => t.Posts).ThenInclude(p => p.Comments)
+                .Include(t => t.Posts).ThenInclude(p => p.Likes)
+                .FirstOrDefaultAsync();
+            
+            var postsResult = tag.Posts.Skip((request.Page - 1) * 10).Take(10).ToList();
+            var totalCount = postsResult.Count;
+            var totalPages = totalCount / 10 + ((totalCount % 10) != 0 ? 1 : 0);
             var posts = new List<PostResponse>();
             postsResult.ForEach(item =>
             {
@@ -33,7 +39,7 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                     likesResult.Add(pl.UserName);
                 });
                 var tags = new List<string>();
-                foreach(var tag in item.Tags)
+                foreach (var tag in item.Tags)
                 {
                     tags.Add(tag.Name);
                 }
@@ -50,11 +56,13 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                     Tags = tags
                 });
             });
-            var result = new PostsResponse() { 
-                Posts = posts, 
-                Page = request.Page, 
-                TotalCount = totalCount, 
-                TotalPages = totalPages};
+            var result = new PostsResponse()
+            {
+                Posts = posts,
+                Page = request.Page,
+                TotalCount = totalCount,
+                TotalPages = totalPages
+            };
             return result;
         }
     }

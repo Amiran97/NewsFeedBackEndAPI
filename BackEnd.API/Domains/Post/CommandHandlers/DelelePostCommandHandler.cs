@@ -18,12 +18,22 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
 
         public async Task<Unit> Handle(DeletePostCommand request, CancellationToken cancellationToken)
         {
-            var post = await context.Posts.Include(p => p.Author).FirstOrDefaultAsync(p => p.Id == request.Id && p.Author.UserName == request.AuthorName);
+            var post = await context.Posts.Include(p => p.Author).Where(p => p.Id == request.Id && p.Author.UserName == request.AuthorName).Include(p=>p.Tags).FirstOrDefaultAsync();
             if (post == null)
             {
                 throw new KeyNotFoundException();
             } else
             {
+                post.Tags.ToList().ForEach(tag => {
+                    tag.Posts.Remove(post);
+                    if(tag.Posts.Count <= 0)
+                    {
+                        context.Tags.Remove(tag);
+                    } else
+                    {
+                        context.Tags.Update(tag);
+                    }
+                });
                 context.Posts.Remove(post);
                 await context.SaveChangesAsync();
             }
