@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BackEnd.Infrastructure.Models.Dtos
+namespace BackEnd.API.Models.Dtos
 {
     public class PostRequest
     {

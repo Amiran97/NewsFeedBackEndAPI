@@ -1,6 +1,6 @@
 ﻿using BackEnd.API.Domains.Post.Commands;
 using BackEnd.API.Domains.Post.Queries;
-using BackEnd.Infrastructure.Models.Dtos;
+using BackEnd.API.Models.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

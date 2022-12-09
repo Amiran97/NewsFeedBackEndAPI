@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BackEnd.Infrastructure.Models
+namespace BackEnd.API.Models
 {
     public class User : IdentityUser
     {

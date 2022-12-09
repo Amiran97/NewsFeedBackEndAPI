@@ -1,11 +1,11 @@
-﻿using BackEnd.Infrastructure.Models.Dtos;
+﻿using BackEnd.API.Models.Dtos;
 using BackEnd.API.Utils;
-using BackEnd.Infrastructure.Context;
+using BackEnd.API.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using BackEnd.Infrastructure.Models;
+using BackEnd.API.Models;
 using BackEnd.API.Options;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;

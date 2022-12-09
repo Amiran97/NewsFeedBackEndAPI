@@ -1,6 +1,6 @@
 ﻿using BackEnd.API.Domains.Like.Commands;
-using BackEnd.Infrastructure.Context;
-using BackEnd.Infrastructure.Models;
+using BackEnd.API.Context;
+using BackEnd.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +21,7 @@ namespace BackEnd.API.Domains.Like.CommandHandlers
         public async Task<Unit> Handle(PostLikeCommand request, CancellationToken cancellationToken)
         {
             User author = await userManager.FindByNameAsync(request.AuthorName);
-            Infrastructure.Models.Post post = await context.Posts.Where(p=>p.Id == request.Id).Include(p=>p.Author).FirstOrDefaultAsync();
+            Models.Post post = await context.Posts.Where(p=>p.Id == request.Id).Include(p=>p.Author).FirstOrDefaultAsync();
 
             if (author != null && post != null)
             {

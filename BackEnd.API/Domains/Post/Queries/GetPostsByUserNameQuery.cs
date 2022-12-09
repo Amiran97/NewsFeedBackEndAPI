@@ -1,4 +1,4 @@
-﻿using BackEnd.Infrastructure.Models.Dtos;
+﻿using BackEnd.API.Models.Dtos;
 using MediatR;
 
 namespace BackEnd.API.Domains.Post.Queries

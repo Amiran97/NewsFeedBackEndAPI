@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BackEnd.Infrastructure.Models.Dtos
+namespace BackEnd.API.Models.Dtos
 {
-    public class CommentRequest
+    public class LikeResponse
     {
-        public string Message { get; set; }
+        public string AuthorName { get; set; }
     }
 }

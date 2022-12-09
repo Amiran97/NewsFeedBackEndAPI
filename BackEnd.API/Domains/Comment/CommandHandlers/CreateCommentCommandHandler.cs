@@ -1,6 +1,6 @@
 ﻿using BackEnd.API.Domains.Comment.Commands;
-using BackEnd.Infrastructure.Context;
-using BackEnd.Infrastructure.Models;
+using BackEnd.API.Context;
+using BackEnd.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -20,10 +20,10 @@ namespace BackEnd.API.Domains.Comment.CommandHandlers
         public async Task<Unit> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
         {
             User author = await userManager.FindByNameAsync(request.AuthorName);
-            Infrastructure.Models.Post post = await context.Posts.FindAsync(request.PostId);
+            Models.Post post = await context.Posts.FindAsync(request.PostId);
             if(post != null && author != null)
             {
-                Infrastructure.Models.Comment comment = new Infrastructure.Models.Comment
+                API.Models.Comment comment = new Models.Comment
                 {
                     Author = author,
                     Post = post,

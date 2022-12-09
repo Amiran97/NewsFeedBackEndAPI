@@ -1,6 +1,6 @@
 ﻿using BackEnd.API.Domains.Like.Commands;
-using BackEnd.Infrastructure.Context;
-using BackEnd.Infrastructure.Models;
+using BackEnd.API.Context;
+using BackEnd.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +21,7 @@ namespace BackEnd.API.Domains.Like.CommandHandlers
         public async Task<Unit> Handle(CommentLikeCommand request, CancellationToken cancellationToken)
         {
             User author = await userManager.FindByNameAsync(request.AuthorName);
-            Infrastructure.Models.Comment comment = await context.Comments.Where(c=>c.Id == request.Id).Include(c=>c.Author).FirstOrDefaultAsync();
+            Models.Comment comment = await context.Comments.Where(c=>c.Id == request.Id).Include(c=>c.Author).FirstOrDefaultAsync();
 
             if (author != null && comment != null)
             {

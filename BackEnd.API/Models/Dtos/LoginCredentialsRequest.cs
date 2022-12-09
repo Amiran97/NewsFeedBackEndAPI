@@ -1,4 +1,4 @@
-﻿namespace BackEnd.Infrastructure.Models.Dtos
+﻿namespace BackEnd.API.Models.Dtos
 {
     public class LoginCredentialsRequest
     {
