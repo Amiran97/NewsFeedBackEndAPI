@@ -33,7 +33,7 @@ namespace BackEnd.API.Controllers
                 result = await mediator.Send(new GetPostsByTagQuery() { Page = request.Page, Tag = request.Tag, Option = request.Option });
             } else
             {
-                result = await mediator.Send(new GetPostsQuery() { Page = request.Page, Option = Models.PostFilterOption.Newest });
+                result = await mediator.Send(new GetPostsQuery() { Page = request.Page, Option = request.Option });
             }
             if (result == null)
             {

@@ -28,11 +28,14 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                 .FirstOrDefaultAsync();
 
             var postsQuery = tag.Posts.AsQueryable();
-            if (request.Option == Models.PostFilterOption.Newest)
+            if (request.Option == Models.PostFilterOption.Newest || request.Option == Models.PostFilterOption.None)
             {
                 postsQuery = postsQuery.OrderByDescending(p => p.CreatedAt);
+            } else if (request.Option == Models.PostFilterOption.Popular)
+            {
+                postsQuery = postsQuery.OrderByDescending(p => p.Likes.Count());
             }
-            var postsResult = tag.Posts.Skip((request.Page - 1) * 10).Take(10).ToList();
+            var postsResult = postsQuery.Skip((request.Page - 1) * 10).Take(10).ToList();
             var totalCount = postsResult.Count;
             var totalPages = totalCount / 10 + ((totalCount % 10) != 0 ? 1 : 0);
             var posts = new List<PostResponse>();
