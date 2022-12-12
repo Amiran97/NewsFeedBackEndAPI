@@ -3,6 +3,7 @@ using BackEnd.API.Context;
 using BackEnd.API.Models.Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using BackEnd.API.Utils.Mappers;
 
 namespace BackEnd.API.Domains.Comment.QueryHadlers
 {
@@ -17,26 +18,8 @@ namespace BackEnd.API.Domains.Comment.QueryHadlers
 
         public async Task<IEnumerable<CommentResponse>> Handle(GetCommentsByPostIdQuery request, CancellationToken cancellationToken)
         {
-            
             var comments = await context.Comments.Include(c=>c.Post).Where(c=>c.Post.Id == request.PostId).Include(c=>c.Likes).Include(c=>c.Author).ToListAsync();
-            var result = new List<CommentResponse>();
-            comments.ForEach(item =>
-            {
-                var likesResult = new List<string>();
-                item.Likes.ToList().ForEach(pl =>
-                {
-                    likesResult.Add(pl.UserName);
-                });
-                result.Add(new CommentResponse
-                {
-                    Id = item.Id,
-                    AuthorName = item.Author.UserName,
-                    CreateAt = item.CreateAt,
-                    Message = item.Message,
-                    PostId = request.PostId,
-                    Likes = likesResult
-                });
-            });
+            var result = CommentMapper.ToCommentResponseCollection(comments, request.PostId);
             return result;
         }
     }

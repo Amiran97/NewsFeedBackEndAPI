@@ -2,8 +2,8 @@
 using BackEnd.API.Context;
 using BackEnd.API.Models.Dtos;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BackEnd.API.Utils.Mappers;
 
 namespace BackEnd.API.Domains.Post.QueryHandlers
 {
@@ -23,28 +23,7 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
             {
                 return null;
             }
-            var likesResult = new List<string>();
-            post.Likes.ToList().ForEach(item =>
-            {
-                likesResult.Add(item.UserName);
-            });
-            var tags = new List<string>();
-            foreach (var tag in post.Tags)
-            {
-                tags.Add(tag.Name);
-            }
-            var result = new PostResponse()
-            {
-                Id = post.Id,
-                Title = post.Title,
-                Content = post.Content,
-                CreatedAt = post.CreatedAt,
-                UpdatedAt = post.UpdatedAt,
-                AuthorName = post.Author.UserName,
-                Likes = likesResult,
-                CommentCount = post.Comments.Count,
-                Tags = tags
-            };
+            var result = PostMapper.ToPostResponse(post);
             return result;
         }
     }
