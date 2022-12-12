@@ -27,13 +27,13 @@ namespace BackEnd.API.Controllers
             PostsResponse result = null;
             if(request.UserName != null)
             {
-                result = await mediator.Send(new GetPostsByUserNameQuery() { Page = request.Page, UserName = request.UserName });
+                result = await mediator.Send(new GetPostsByUserNameQuery() { Page = request.Page, UserName = request.UserName, Option = request.Option });
             } else if(request.Tag != null)
             {
-                result = await mediator.Send(new GetPostsByTagQuery() { Page = request.Page, Tag = request.Tag });
+                result = await mediator.Send(new GetPostsByTagQuery() { Page = request.Page, Tag = request.Tag, Option = request.Option });
             } else
             {
-                result = await mediator.Send(new GetPostsQuery() { Page = request.Page });
+                result = await mediator.Send(new GetPostsQuery() { Page = request.Page, Option = Models.PostFilterOption.Newest });
             }
             if (result == null)
             {

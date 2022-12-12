@@ -23,7 +23,12 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
             {
                 return null;
             }
-            var postsResult = await context.Posts.Skip((request.Page-1) * 10).Take(10).Include(p=>p.Author).Include(p=>p.Comments).Include(p=>p.Likes).Include(p=>p.Tags).ToListAsync();
+            var postsQuery = context.Posts.AsQueryable();
+            if(request.Option == Models.PostFilterOption.Newest)
+            {
+                postsQuery = postsQuery.OrderByDescending(p => p.CreatedAt);
+            }
+            var postsResult = await postsQuery.Skip((request.Page-1) * 10).Take(10).Include(p=>p.Author).Include(p=>p.Comments).Include(p=>p.Likes).Include(p=>p.Tags).ToListAsync();
             var posts = new List<PostResponse>();
             postsResult.ForEach(item =>
             {
