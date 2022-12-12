@@ -24,9 +24,12 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                 return null;
             }
             var postsQuery = context.Posts.AsQueryable();
-            if(request.Option == Models.PostFilterOption.Newest)
+            if(request.Option == Models.PostFilterOption.Newest || request.Option == Models.PostFilterOption.None)
             {
                 postsQuery = postsQuery.OrderByDescending(p => p.CreatedAt);
+            } else if(request.Option == Models.PostFilterOption.Popular)
+            {
+                postsQuery = postsQuery.OrderByDescending(p => p.Likes.Count());
             }
             var postsResult = await postsQuery.Skip((request.Page-1) * 10).Take(10).Include(p=>p.Author).Include(p=>p.Comments).Include(p=>p.Likes).Include(p=>p.Tags).ToListAsync();
             var posts = new List<PostResponse>();
