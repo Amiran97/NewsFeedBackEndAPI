@@ -21,7 +21,12 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
             {
                 return null;
             }
-            var postsResult = await context.Posts.Include(p => p.Author).Where(p => p.Author.UserName == request.UserName).Skip((request.Page - 1) * 10).Take(10).Include(p=>p.Comments).Include(p=>p.Likes).Include(p=>p.Tags).ToListAsync();
+            var postsQuery = context.Posts.AsQueryable();
+            if (request.Option == Models.PostFilterOption.Newest)
+            {
+                postsQuery = postsQuery.OrderByDescending(p => p.CreatedAt);
+            }
+            var postsResult = await postsQuery.Include(p => p.Author).Where(p => p.Author.UserName == request.UserName).Skip((request.Page - 1) * 10).Take(10).Include(p=>p.Comments).Include(p=>p.Likes).Include(p=>p.Tags).ToListAsync();
             var totalCount = postsResult.Count;
             var totalPages = totalCount / 10 + ((totalCount % 10) != 0 ? 1 : 0);
             var posts = new List<PostResponse>();

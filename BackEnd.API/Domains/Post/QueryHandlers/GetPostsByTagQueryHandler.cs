@@ -26,7 +26,12 @@ namespace BackEnd.API.Domains.Post.QueryHandlers
                 .Include(t => t.Posts).ThenInclude(p => p.Comments)
                 .Include(t => t.Posts).ThenInclude(p => p.Likes)
                 .FirstOrDefaultAsync();
-            
+
+            var postsQuery = tag.Posts.AsQueryable();
+            if (request.Option == Models.PostFilterOption.Newest)
+            {
+                postsQuery = postsQuery.OrderByDescending(p => p.CreatedAt);
+            }
             var postsResult = tag.Posts.Skip((request.Page - 1) * 10).Take(10).ToList();
             var totalCount = postsResult.Count;
             var totalPages = totalCount / 10 + ((totalCount % 10) != 0 ? 1 : 0);
