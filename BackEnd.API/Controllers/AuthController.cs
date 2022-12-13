@@ -34,14 +34,6 @@ namespace BackEnd.API.Controllers
             this.signInManager = signInManager;
         }
 
-        [HttpGet]
-        [Route("ping")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult Ping()
-        {
-            return Ok("ping");
-        }
-
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login(LoginCredentialsRequest credentials)
@@ -128,11 +120,11 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpPost]
-        [Route("revoke/{username}")]
+        [Route("revoke")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> Revoke(string username)
+        public async Task<IActionResult> Revoke()
         {
-            var user = await userManager.FindByNameAsync(username);
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
             if (user == null) return BadRequest("Invalid user name");
 
             user.RefreshToken = null;
