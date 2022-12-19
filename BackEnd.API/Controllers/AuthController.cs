@@ -120,11 +120,10 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpPost]
-        [Route("revoke")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> Revoke()
+        [Route("revoke/{userName}")]
+        public async Task<IActionResult> Revoke(string userName)
         {
-            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            var user = await userManager.FindByNameAsync(userName);
             if (user == null) return BadRequest("Invalid user name");
 
             user.RefreshToken = null;

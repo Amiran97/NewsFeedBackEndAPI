@@ -3,10 +3,12 @@ using BackEnd.API.Context;
 using BackEnd.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using BackEnd.API.Models.Dtos;
+using BackEnd.API.Utils.Mappers;
 
 namespace BackEnd.API.Domains.Post.CommandHandlers
 {
-    public class CreatePostCommandHandler : IRequestHandler<CreatePostCommand, Unit>
+    public class CreatePostCommandHandler : IRequestHandler<CreatePostCommand, PostResponse>
     {
         private readonly NewsFeedContext context;
         private readonly UserManager<User> userManager;
@@ -17,7 +19,7 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
             this.userManager = userManager;
         }
 
-        public async Task<Unit> Handle(CreatePostCommand request, CancellationToken cancellationToken)
+        public async Task<PostResponse> Handle(CreatePostCommand request, CancellationToken cancellationToken)
         {
             User author = await userManager.FindByNameAsync(request.AuthorName);
             var newPost = new Models.Post() {
@@ -40,9 +42,29 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
                     newPost.Tags.Add(tag);
                 }
             }
+
+            // Save Images
+            if(request.Images != null)
+            {
+                foreach (var file in request.Images)
+                {
+                    var newName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var folderName = Path.Combine("wwwroot", "Images");
+                    var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+                    var fullPath = Path.Combine(pathToSave, newName);
+                    var dbPath = Path.Combine("Images", newName);
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                        newPost.Images.Add(new PostImage() { Path = dbPath });
+                    }
+                }
+            }
+
             context.Posts.Add(newPost);
             await context.SaveChangesAsync();
-            return Unit.Value;
+            return PostMapper.ToPostResponse(newPost);
         }
     }
 }

@@ -1,18 +1,21 @@
 ﻿using BackEnd.API.Domains.Post.Commands;
 using BackEnd.API.Domains.Post.Queries;
+using BackEnd.API.Models;
 using BackEnd.API.Models.Dtos;
+using BackEnd.API.Models.Dtos.Validators;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BackEnd.API.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    [Produces("application/json")]
+    //[Produces("application/json")]
     public class PostController : ControllerBase
     {
         private readonly ISender mediator;
@@ -42,8 +45,6 @@ namespace BackEnd.API.Controllers
             return Ok(result);
         }
 
-        
-
         [HttpGet]
         [Route("detail/{id}")]
         public async Task<IActionResult> getPostById([BindRequired] int id)
@@ -57,17 +58,21 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> createPost(PostRequest request)
+        public async Task<IActionResult> createPost([FromForm] PostRequest request)
         {
+            PostResponse result = null;
             try
             {
-                await mediator.Send(new CreatePostCommand
+                IFormFileCollection formFiles = HttpContext.Request.Form.Files;
+                result = await mediator.Send(new CreatePostCommand
                 {
                     Title = request.Title,
                     Context = request.Content,
                     AuthorName = User.Identity.Name,
-                    Tags = request.Tags
+                    Tags = request.Tags,
+                    Images = formFiles
                 });
             }
             catch (Exception ex)
@@ -75,7 +80,7 @@ namespace BackEnd.API.Controllers
                 return BadRequest();
             }
 
-            return NoContent();
+            return Ok(result);
         }
 
         [HttpPut]
