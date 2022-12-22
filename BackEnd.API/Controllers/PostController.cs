@@ -85,25 +85,29 @@ namespace BackEnd.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Consumes("multipart/form-data")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> updatePost([BindRequired][FromRoute] int id, [FromBody] PostRequest request)
+        public async Task<IActionResult> updatePost([BindRequired][FromRoute] int id, [FromForm] PostRequest request)
         {
+            PostResponse result = null;
             try
             {
-                await mediator.Send(new UpdatePostCommand
+                IFormFileCollection formFiles = HttpContext.Request.Form.Files;
+                result = await mediator.Send(new UpdatePostCommand
                 {
                     Id = id,
                     Title = request.Title,
                     Context = request.Content,
                     AuthorName = User.Identity.Name,
-                    Tags = request.Tags
+                    Tags = request.Tags,
+                    Images = formFiles
                 });
             }
             catch (Exception ex)
             {
                 return BadRequest();
             }
-            return NoContent();
+            return Ok(result);
         }
 
         [HttpDelete]
@@ -123,7 +127,7 @@ namespace BackEnd.API.Controllers
             {
                 return BadRequest();
             }
-            return NoContent();
+            return Ok(id);
         }
     }
 }

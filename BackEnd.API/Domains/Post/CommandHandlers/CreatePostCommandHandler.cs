@@ -53,11 +53,10 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
                     var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
 
                     var fullPath = Path.Combine(pathToSave, newName);
-                    var dbPath = Path.Combine("Images", newName);
                     using (var stream = new FileStream(fullPath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
-                        newPost.Images.Add(new PostImage() { Path = dbPath });
+                        newPost.Images.Add(new PostImage() { Path = newName });
                     }
                 }
             }
