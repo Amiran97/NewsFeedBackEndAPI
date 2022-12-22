@@ -18,6 +18,7 @@ namespace BackEnd.API.Models.Dtos
         public ICollection<string> Likes { get; set; }
         public ICollection<string> Tags { get; set; }
         public int CommentCount { get; set; }
+        public ICollection<string> Images { get; set; }
         
     }
 }

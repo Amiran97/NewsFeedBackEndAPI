@@ -9,6 +9,7 @@ namespace BackEnd.API.Utils.Mappers
         {
             var likesResult = LikeMapper.ToStringCollection(post.Likes);
             var tags = TagMapper.ToStringCollection(post.Tags);
+            var images = ImageMapper.ToStringCollection(post.Images);
             var result = new PostResponse()
             {
                 Id = post.Id,
@@ -19,7 +20,8 @@ namespace BackEnd.API.Utils.Mappers
                 AuthorName = post.Author.UserName,
                 Likes = likesResult,
                 CommentCount = post.Comments.Count,
-                Tags = tags
+                Tags = tags,
+                Images = images
             };
             return result;
         }

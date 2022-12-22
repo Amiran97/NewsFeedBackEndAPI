@@ -11,6 +11,6 @@ namespace BackEnd.API.Models.Dtos
     {
         public string Title { get; set; }
         public string Content { get; set; }
-        public ICollection<string> Tags { get; set; }
+        public ICollection<string>? Tags { get; set; }
     }
 }

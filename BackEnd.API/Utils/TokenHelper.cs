@@ -41,8 +41,7 @@ namespace BackEnd.API.Utils
                 ValidIssuer = AuthOptions.ISSUER,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromMinutes(AuthOptions.LIFETIME)
+                ValidateLifetime = false
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.Features;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +21,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins, policy => 
     {
         policy.WithOrigins("http://localhost:5000",
-            "http://localhost:5001");
+            "http://localhost:5001",
+            "http://localhost:4200");
         policy.AllowAnyMethod().AllowAnyHeader();
     });
 });
@@ -104,6 +106,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = int.MaxValue;
+    o.MemoryBufferThreshold = int.MaxValue;
+});
 var app = builder.Build();
 
 var scope = app.Services.CreateScope();

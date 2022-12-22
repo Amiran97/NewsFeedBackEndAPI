@@ -4,10 +4,12 @@ using BackEnd.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BackEnd.API.Models.Dtos;
+using BackEnd.API.Utils.Mappers;
 
 namespace BackEnd.API.Domains.Post.CommandHandlers
 {
-    public class UpdatePostCommandHandler : IRequestHandler<UpdatePostCommand, Unit>
+    public class UpdatePostCommandHandler : IRequestHandler<UpdatePostCommand, PostResponse>
     {
         private readonly NewsFeedContext context;
 
@@ -16,7 +18,7 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
             this.context = context;
         }
 
-        public async Task<Unit> Handle(UpdatePostCommand request, CancellationToken cancellationToken)
+        public async Task<PostResponse> Handle(UpdatePostCommand request, CancellationToken cancellationToken)
         {
             var post = await context.Posts.Include(p => p.Author).Where(p => p.Id == request.Id && p.Author.UserName == request.AuthorName).Include(p=>p.Tags).FirstOrDefaultAsync();
             if (post == null)
@@ -28,6 +30,37 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
                 post.Title = request.Title;
                 post.Content = request.Context;
                 post.UpdatedAt = DateTime.UtcNow;
+
+                if(request.Images != null && request.Images.Count > 0)
+                {
+                    post.Images.ToList().ForEach(image =>
+                    {
+                        var folderName = Path.Combine("wwwroot", "Images");
+                        var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                        var fullPath = Path.Combine(pathToSave, image.Path);
+                        if (File.Exists(fullPath))
+                        {
+                            File.Delete(fullPath);
+                        }
+                        context.PostImages.Remove(image);
+                    });
+
+                    post.Images.Clear();
+
+                    foreach(var file in request.Images)
+                    {
+                        var newName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                        var folderName = Path.Combine("wwwroot", "Images");
+                        var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+                        var fullPath = Path.Combine(pathToSave, newName);
+                        using (var stream = new FileStream(fullPath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                            post.Images.Add(new PostImage() { Path = newName });
+                        }
+                    }
+                }
 
                 var tags = await context.Tags.ToListAsync();
 
@@ -56,7 +89,7 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
                 context.Posts.Update(post);
                 await context.SaveChangesAsync();
             }
-            return Unit.Value;
+            return PostMapper.ToPostResponse(post);
         }
     }
 }

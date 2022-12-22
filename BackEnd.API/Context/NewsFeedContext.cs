@@ -13,6 +13,7 @@ namespace BackEnd.API.Context
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<PostImage> PostImages { get; set; }
 
         public NewsFeedContext(DbContextOptions options) : base(options)
         {
@@ -35,9 +36,11 @@ namespace BackEnd.API.Context
 
             builder.Entity<Post>().HasMany(p => p.Comments).WithOne(c => c.Post);
 
-            builder.Entity<Post>().HasMany(p => p.Likes).WithMany(c => c.PostLikes).UsingEntity(t => t.ToTable("PostLikes"));
+            builder.Entity<Post>().HasMany(p => p.Likes).WithMany(u => u.PostLikes).UsingEntity(t => t.ToTable("PostLikes"));
 
-            builder.Entity<Post>().HasMany(p => p.Tags).WithMany(c => c.Posts).UsingEntity(t => t.ToTable("PostTags"));
+            builder.Entity<Post>().HasMany(p => p.Tags).WithMany(t => t.Posts).UsingEntity(t => t.ToTable("PostTags"));
+            
+            builder.Entity<Post>().HasMany(p => p.Images).WithOne(i => i.Post);
 
             // Comment
             builder.Entity<Comment>().ToTable("Comments");
@@ -56,14 +59,24 @@ namespace BackEnd.API.Context
             // Tag
             builder.Entity<Tag>().ToTable("Tags");
 
-            builder.Entity<Tag>().HasKey(c => c.Id);
-            builder.Entity<Tag>().Property(c => c.Id).ValueGeneratedOnAdd();
+            builder.Entity<Tag>().HasKey(t => t.Id);
+            builder.Entity<Tag>().Property(t => t.Id).ValueGeneratedOnAdd();
 
-            builder.Entity<Tag>().Property(c => c.Name).HasMaxLength(32).IsRequired();
+            builder.Entity<Tag>().Property(t => t.Name).HasMaxLength(32).IsRequired();
 
-            builder.Entity<Tag>().HasMany(p => p.Posts).WithMany(c => c.Tags).UsingEntity(t => t.ToTable("PostTags"));
+            builder.Entity<Tag>().HasMany(t => t.Posts).WithMany(p => p.Tags).UsingEntity(t => t.ToTable("PostTags"));
 
             base.OnModelCreating(builder);
+
+            // PostImage
+            builder.Entity<PostImage>().ToTable("PostImages");
+
+            builder.Entity<PostImage>().HasKey(i => i.Id);
+            builder.Entity<PostImage>().Property(i => i.Id).ValueGeneratedOnAdd();
+
+            builder.Entity<PostImage>().Property(i => i.Path).HasMaxLength(255).IsRequired();
+
+            builder.Entity<PostImage>().HasOne(i => i.Post).WithMany(p => p.Images).HasForeignKey(i => i.PostId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
