@@ -18,7 +18,7 @@ namespace BackEnd.API.Domains.Comment.QueryHadlers
 
         public async Task<IEnumerable<CommentResponse>> Handle(GetCommentsByPostIdQuery request, CancellationToken cancellationToken)
         {
-            var comments = await context.Comments.Include(c=>c.Post).Where(c=>c.Post.Id == request.PostId).Include(c=>c.Likes).Include(c=>c.Author).ToListAsync();
+            var comments = await context.Comments.Include(c=>c.Post).Where(c=>c.Post.Id == request.PostId).OrderByDescending(c => c.CreateAt).Include(c=>c.Likes).Include(c=>c.Author).ToListAsync();
             var result = CommentMapper.ToCommentResponseCollection(comments, request.PostId);
             return result;
         }

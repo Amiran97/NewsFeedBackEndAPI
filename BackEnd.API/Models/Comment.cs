@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BackEnd.API.Models
+﻿namespace BackEnd.API.Models
 {
     public class Comment
     {
@@ -17,7 +9,6 @@ namespace BackEnd.API.Models
         public virtual User Author { get; set; }
         public int PostId { get; set; }
         public virtual Post Post { get; set; }
-        public virtual ICollection<User> Likes { get; set; }
-
+        public virtual ICollection<User> Likes { get; set; } = new HashSet<User>();
     }
 }

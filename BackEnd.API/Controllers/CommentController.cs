@@ -34,9 +34,10 @@ namespace BackEnd.API.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> createComment([BindRequired][FromRoute] int id, [FromBody] CommentRequest request)
         {
+            CommentResponse result = null;
             try
             {
-                await mediator.Send(new CreateCommentCommand
+                result = await mediator.Send(new CreateCommentCommand
                 {
                     PostId = id,
                     Message = request.Message,
@@ -48,7 +49,7 @@ namespace BackEnd.API.Controllers
                 return BadRequest();
             }
 
-            return NoContent();
+            return Ok(result);
         }
 
         [HttpDelete]
@@ -69,7 +70,7 @@ namespace BackEnd.API.Controllers
                 return BadRequest();
             }
 
-            return NoContent();
+            return Ok(id);
         }
     }
 }

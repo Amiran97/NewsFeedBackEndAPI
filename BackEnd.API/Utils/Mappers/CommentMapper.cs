@@ -10,17 +10,22 @@ namespace BackEnd.API.Utils.Mappers
             var result = new List<CommentResponse>();
             comments.ToList().ForEach(item =>
             {
-                var likesResult = LikeMapper.ToStringCollection(item.Likes);
-                result.Add(new CommentResponse
-                {
-                    Id = item.Id,
-                    AuthorName = item.Author.UserName,
-                    CreateAt = item.CreateAt,
-                    Message = item.Message,
-                    PostId = postId,
-                    Likes = likesResult
-                });
+                result.Add(ToCommentResponse(item, postId));
             });
+            return result;
+        }
+
+        public static CommentResponse ToCommentResponse(Comment comment, int postId)
+        {
+            var likesResult = LikeMapper.ToStringCollection(comment.Likes);
+            var result = new CommentResponse() {
+                Id = comment.Id,
+                AuthorName = comment.Author.UserName,
+                CreateAt = comment.CreateAt,
+                Message = comment.Message,
+                PostId = postId,
+                Likes = likesResult
+            };
             return result;
         }
     }

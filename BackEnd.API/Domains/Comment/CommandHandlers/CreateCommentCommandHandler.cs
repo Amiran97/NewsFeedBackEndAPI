@@ -3,10 +3,12 @@ using BackEnd.API.Context;
 using BackEnd.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using BackEnd.API.Models.Dtos;
+using BackEnd.API.Utils.Mappers;
 
 namespace BackEnd.API.Domains.Comment.CommandHandlers
 {
-    public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, Unit>
+    public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, CommentResponse>
     {
         private readonly NewsFeedContext context;
         private readonly UserManager<User> userManager;
@@ -17,7 +19,7 @@ namespace BackEnd.API.Domains.Comment.CommandHandlers
             this.userManager = userManager;
         }
 
-        public async Task<Unit> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
+        public async Task<CommentResponse> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
         {
             User author = await userManager.FindByNameAsync(request.AuthorName);
             Models.Post post = await context.Posts.FindAsync(request.PostId);
@@ -32,8 +34,9 @@ namespace BackEnd.API.Domains.Comment.CommandHandlers
                 };
                 context.Comments.Add(comment);
                 await context.SaveChangesAsync();
+                return CommentMapper.ToCommentResponse(comment, request.PostId);
             }
-            return Unit.Value;
+            return null;
         }
     }
 }
