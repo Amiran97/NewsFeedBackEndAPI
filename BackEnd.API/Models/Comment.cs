@@ -10,5 +10,6 @@
         public int PostId { get; set; }
         public virtual Post Post { get; set; }
         public virtual ICollection<User> Likes { get; set; } = new HashSet<User>();
+        public virtual ICollection<User> Dislikes { get; set; } = new HashSet<User>();
     }
 }

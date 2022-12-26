@@ -1,6 +1,7 @@
 ﻿using BackEnd.API.Domains.Like.CommandHandlers;
 using BackEnd.API.Domains.Like.Commands;
 using BackEnd.API.Domains.Post.Commands;
+using BackEnd.API.Models.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,13 +23,14 @@ namespace BackEnd.API.Controllers
         }
 
         [HttpPost]
-        [Route("post/{id}")]
+        [Route("Post/like/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> likePost([FromRoute][BindRequired] int id)
         {
+            PostResponse result = null; 
             try
             {
-                await mediator.Send(new PostLikeCommand
+                result = await mediator.Send(new PostLikeCommand
                 {
                     Id = id,
                     AuthorName = User.Identity.Name
@@ -39,17 +41,18 @@ namespace BackEnd.API.Controllers
                 return BadRequest();
             }
 
-            return NoContent();
+            return Ok(result);
         }
 
         [HttpPost]
-        [Route("comment/{id}")]
+        [Route("Post/dislike/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> likeComment([FromRoute][BindRequired] int id)
+        public async Task<IActionResult> dislikePost([FromRoute][BindRequired] int id)
         {
+            PostResponse result = null;
             try
             {
-                await mediator.Send(new CommentLikeCommand
+                result = await mediator.Send(new PostDislikeCommand
                 {
                     Id = id,
                     AuthorName = User.Identity.Name
@@ -60,7 +63,51 @@ namespace BackEnd.API.Controllers
                 return BadRequest();
             }
 
-            return NoContent();
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("Comment/like/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> likeComment([FromRoute][BindRequired] int id)
+        {
+            CommentResponse result = null;
+            try
+            {
+                result = await mediator.Send(new CommentLikeCommand
+                {
+                    Id = id,
+                    AuthorName = User.Identity.Name
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("Comment/dislike/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> dislikeComment([FromRoute][BindRequired] int id)
+        {
+            CommentResponse result = null;
+            try
+            {
+                result = await mediator.Send(new CommentDislikeCommand
+                {
+                    Id = id,
+                    AuthorName = User.Identity.Name
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+
+            return Ok(result);
         }
     }
 }

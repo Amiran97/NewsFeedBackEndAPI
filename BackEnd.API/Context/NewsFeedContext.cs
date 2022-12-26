@@ -38,6 +38,8 @@ namespace BackEnd.API.Context
 
             builder.Entity<Post>().HasMany(p => p.Likes).WithMany(u => u.PostLikes).UsingEntity(t => t.ToTable("PostLikes"));
 
+            builder.Entity<Post>().HasMany(p => p.Dislikes).WithMany(u => u.PostDislikes).UsingEntity(t => t.ToTable("PostDislikes"));
+
             builder.Entity<Post>().HasMany(p => p.Tags).WithMany(t => t.Posts).UsingEntity(t => t.ToTable("PostTags"));
             
             builder.Entity<Post>().HasMany(p => p.Images).WithOne(i => i.Post);
@@ -55,6 +57,8 @@ namespace BackEnd.API.Context
             builder.Entity<Comment>().HasOne(c => c.Post).WithMany(p => p.Comments).HasForeignKey(c => c.PostId).OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Comment>().HasMany(c => c.Likes).WithMany(u => u.CommentLikes).UsingEntity(t => t.ToTable("CommentLikes"));
+
+            builder.Entity<Comment>().HasMany(c => c.Dislikes).WithMany(u => u.CommentDislikes).UsingEntity(t => t.ToTable("CommentDislikes"));
 
             // Tag
             builder.Entity<Tag>().ToTable("Tags");

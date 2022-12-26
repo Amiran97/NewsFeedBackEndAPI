@@ -35,6 +35,7 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
                         context.Tags.Update(tag);
                     }
                 });
+                post.Comments.ToList().ForEach(comment => context.Comments.Remove(comment));
                 post.Images.ToList().ForEach(image =>
                 {
                     var folderName = Path.Combine("wwwroot", "Images");

@@ -20,6 +20,7 @@ namespace BackEnd.API.Models
         public virtual User Author { get; set; }
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public virtual ICollection<User> Likes { get; set; } = new HashSet<User>();
+        public virtual ICollection<User> Dislikes { get; set; } = new HashSet<User>();
         public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
         public virtual ICollection<PostImage> Images { get; set; } = new List<PostImage>();
     }

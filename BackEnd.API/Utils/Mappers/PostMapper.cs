@@ -8,6 +8,7 @@ namespace BackEnd.API.Utils.Mappers
         public static PostResponse ToPostResponse(Post post)
         {
             var likesResult = LikeMapper.ToStringCollection(post.Likes);
+            var dislikesResult = LikeMapper.ToStringCollection(post.Dislikes);
             var tags = TagMapper.ToStringCollection(post.Tags);
             var images = ImageMapper.ToStringCollection(post.Images);
             var result = new PostResponse()
@@ -19,6 +20,8 @@ namespace BackEnd.API.Utils.Mappers
                 UpdatedAt = post.UpdatedAt,
                 AuthorName = post.Author.UserName,
                 Likes = likesResult,
+                Dislikes = dislikesResult,
+                Rating = likesResult.Count - dislikesResult.Count,
                 CommentCount = post.Comments.Count,
                 Tags = tags,
                 Images = images
