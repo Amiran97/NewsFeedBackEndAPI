@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BackEnd.API.Models.Dtos;
 using BackEnd.API.Utils.Mappers;
+using BackEnd.API.Utils;
 
 namespace BackEnd.API.Domains.Post.CommandHandlers
 {
@@ -35,31 +36,17 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
                 {
                     post.Images.ToList().ForEach(image =>
                     {
-                        var folderName = Path.Combine("wwwroot", "Images");
-                        var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                        var fullPath = Path.Combine(pathToSave, image.Path);
-                        if (File.Exists(fullPath))
-                        {
-                            File.Delete(fullPath);
-                        }
+                        ImageHelper.RemoveImage(image.Path);
                         context.PostImages.Remove(image);
                     });
 
                     post.Images.Clear();
 
-                    foreach(var file in request.Images)
+                    var imagesRes = await ImageHelper.SaveImages(request.Images);
+                    imagesRes.ToList().ForEach(image =>
                     {
-                        var newName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                        var folderName = Path.Combine("wwwroot", "Images");
-                        var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-
-                        var fullPath = Path.Combine(pathToSave, newName);
-                        using (var stream = new FileStream(fullPath, FileMode.Create))
-                        {
-                            await file.CopyToAsync(stream);
-                            post.Images.Add(new PostImage() { Path = newName });
-                        }
-                    }
+                        post.Images.Add(new PostImage() { Path = image });
+                    });
                 }
 
                 var tags = await context.Tags.ToListAsync();

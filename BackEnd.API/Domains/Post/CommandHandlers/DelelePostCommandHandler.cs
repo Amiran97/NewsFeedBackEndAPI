@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Mime;
+using BackEnd.API.Utils;
 
 namespace BackEnd.API.Domains.Post.CommandHandlers
 {
@@ -38,13 +39,7 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
                 post.Comments.ToList().ForEach(comment => context.Comments.Remove(comment));
                 post.Images.ToList().ForEach(image =>
                 {
-                    var folderName = Path.Combine("wwwroot", "Images");
-                    var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                    var fullPath = Path.Combine(pathToSave, image.Path);
-                    if(File.Exists(fullPath))
-                    {
-                        File.Delete(fullPath);
-                    }
+                    ImageHelper.RemoveImage(image.Path);
                     context.PostImages.Remove(image);
                 });
                 context.Posts.Remove(post);

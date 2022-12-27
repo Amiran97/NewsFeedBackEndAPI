@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using BackEnd.API.Models.Dtos;
 using BackEnd.API.Utils.Mappers;
+using BackEnd.API.Utils;
 
 namespace BackEnd.API.Domains.Post.CommandHandlers
 {
@@ -46,19 +47,11 @@ namespace BackEnd.API.Domains.Post.CommandHandlers
             // Save Images
             if(request.Images != null)
             {
-                foreach (var file in request.Images)
+                var imagesRes = await ImageHelper.SaveImages(request.Images);
+                imagesRes.ToList().ForEach(image =>
                 {
-                    var newName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    var folderName = Path.Combine("wwwroot", "Images");
-                    var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-
-                    var fullPath = Path.Combine(pathToSave, newName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                        newPost.Images.Add(new PostImage() { Path = newName });
-                    }
-                }
+                    newPost.Images.Add(new PostImage() { Path = image });
+                });
             }
 
             context.Posts.Add(newPost);
